@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+<body>
+<div id="main" style="width: 100%;height:600px;">
+
+</div>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/echarts.min.js"></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"json/fgl.json?t="+Math.random()*10000,
+            dataType:"json",
+            success:function (data) {
+                console.log(data.data);
+                chartData(data.data);
+            }
+        });
+        function chartData(obj){
+            var cDate=[],OriginalCount=[],ReprintCount=[],OriginalRate=[];
+            $.each(obj,function (index,item) {
+                cDate.push(item.cdate.slice(-5));
+                OriginalCount.push(item.OriginalCount);
+                OriginalRate.push(item.originalrate.replace(/%$/,""));
+                ReprintCount.push(item.ReprintCount);
+            });
+            console.log(OriginalRate);
+
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+
+            // 指定图表的配置项和数据
+            var color=['#BF9463', '#ff503f', '#66b7f0'];
+            var option = {
+                backgroundColor:"rgb(29, 5, 5)",
+                title: {
+                    text: '分析图表',
+                    subtext:"2018年1月",
+                    textStyle:{
+                        color:"#fff"
+                    }
+                },
+                tooltip: {
+                    trigger:"axis",
+                    axisPointer: {
+                        type: "shadow"
+                    },
+                },
+                legend: {
+                    textStyle:{
+                        color:"#fff"
+                    },
+                    top:"20",
+                    data: [
+                        {
+                            name: '转载量',
+                            textStyle: {
+                                fontSize: 12,
+                                fontWeight: 'bolder',
+                                color: '#999'
+                            },
+                            icon: 'image://img/icon-01-01.png'
+                        },
+                        {
+                            name: '原创量',
+                            textStyle: {
+                                fontSize: 12,
+                                fontWeight: 'bolder',
+                                color: '#999'
+                            },
+                            icon: 'image://img/icon-01-02.png'
+                        },
+                        {
+                            name: '原创率(%)',
+                            textStyle: {
+                                fontSize: 12,
+                                fontWeight: 'bolder',
+                                color: '#999'
+                            },
+                            icon: 'image://img/icon-01-03.png'
+                        }
+                    ]
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '11%',
+                    top:"10%",
+                    containLabel: true,
+                    textStyle: {
+                        color: "#fff"
+                    }
+                },
+                xAxis: {
+                    data: cDate,
+                    axisLabel:{
+                        rotate:45,
+                        color:"#fff"
+                    },
+                    axisTick: {
+                        show: true,
+                        alignWithLabel: true,
+                        length: 5,
+                        lineStyle: {
+                            color: '#D8B58A',
+                            type: 'solid',
+                            width: 1
+                        }
+                    }
+
+                },
+                yAxis: [
+                    {
+                        type:"value",
+                        position:"left",
+                        axisLine:{
+                            show:false,
+                            lineStyle: {
+                                color: '#fff'
+                            }
+                        },
+                        splitLine: {//Y轴横线
+                            show: true,
+                            lineStyle: {
+                                color: 'rgba(170,152,136,0.3)',
+                                type: 'solid',
+                                width: 1
+                            }
+                        },
+                        axisLabel:{
+                            formatter:"{value}",
+                            color:"#fff"
+                        },
+                        axisTick: {
+                            show: true,
+                            length: 5,
+                            lineStyle: {
+                                color: '#D8B58A',
+                                type: 'solid',
+                                width: 1
+                            }
+                        }
+                    },{
+                        type:"value",
+                        position:"right",
+                        axisLine:{
+                            show:false,
+                            lineStyle: {
+                                color: '#fff'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel:{
+                            formatter:"{value}",
+                            color:"#fff"
+                        },
+                        axisTick: {
+                            show: true,
+                            length: 5,
+                            lineStyle: {
+                                color: '#D8B58A',
+                                type: 'solid',
+                                width: 1
+                            }
+                        }
+                    }
+                ],
+                dataZoom: [
+                    {
+                        show: true,
+                        start: 0,
+                        end: 50,
+                        height: 15,
+                    },
+                    {
+                        type: 'inside',
+                        start: 0,
+                        end: 50,
+                    }
+                ],
+                series: [
+                    {
+                        name: '转载量',
+                        type: 'bar',
+                        barWidth:"14",
+                        stack:"sum",
+                        itemStyle:{
+                            color:color[0],
+                            barBorderRadius: 25
+                        },
+                        data: ReprintCount
+                    },
+                    {
+                        name: '原创量',
+                        type: 'bar',
+                        barWidth:"14",
+                        stack:"sum",
+                        itemStyle:{
+                            color:color[1],
+                            barBorderRadius: 25
+                        },
+                        data: OriginalCount
+                    },
+                    {
+                        name: '原创率(%)',
+                        yAxisIndex: 1,
+                        type: 'line',
+                        itemStyle:{
+                            color:color[2]
+                        },
+                        data: OriginalRate
+                    }
+                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    })
+</script>
+</body>
+</html>

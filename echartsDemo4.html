@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+<body>
+<div id="main" style="width: 900px;height:490px;">
+
+</div>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/echarts.min.js"></script>
+<script src="js/china.js"></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"json/provence.json?t="+Math.random()*10000,
+            dataType:"json",
+            success:function (data) {
+                console.log(data.data);
+                chartData(data.data);
+            }
+        });
+        function chartData(obj){
+            var provenceInfo=[];
+            var max=0;
+            $.each(obj,function(index,item){
+                provenceInfo.push({name:item.name,value:item.count});
+                if (item.count > max) {
+                    max = item.count;
+                }
+            });
+            console.log(max);
+            console.log(provenceInfo);
+
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+            // 指定图表的配置项和数据
+            var option = {
+                backgroundColor:"#402b0d",
+                tooltip: {
+                    trigger: 'item',
+//                    formatter:"{b}<br/>转载量:{c}",
+                    formatter: function (p) {
+                        for (var i = 0; i < provenceInfo.length; i++) {
+//                            console.log(p.name);
+                            if (p.name == provenceInfo[i].name)
+                                return p.name + '<br/>转载量:' + '  ' + p.value;    //悬浮框里面的值
+                        }
+                        if (!p) {
+                            return '{b} <br/> -'
+                        }
+                    }
+                },
+                visualMap: {
+                    min: 0,
+                    max: max,
+                    left: '10%',
+                    bottom: '1%',
+                    text: ['高','低'],           // 文本，默认为数值文本
+                    calculable: true,
+                    color: ["#7b5e3d", "#d8ac73"],
+                    textStyle: {
+                        color: "#fefefe"
+                    }
+                },
+                series: [
+                    {
+                        name: '地域',
+                        type: 'map',
+                        mapType: 'china',
+                        roam: false,
+                        label: {
+                            normal: {
+                                show: false
+                            },
+                            emphasis: {
+                                show: false
+                            }
+                        },
+                        data:provenceInfo,
+                        zoom: 1.2
+                    },
+                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    })
+</script>
+</body>
+</html>

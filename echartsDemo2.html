@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+<body>
+<div id="main" style="width: 440px;height:490px;">
+
+</div>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/echarts.min.js"></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"json/origin.json?t="+Math.random()*10000,
+            dataType:"json",
+            success:function (data) {
+                console.log(data.data);
+                chartData(data.data);
+            }
+        });
+        function chartData(obj){
+
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+
+            // 指定图表的配置项和数据
+            var option = {
+                backgroundColor:"rgb(29, 5, 5)",
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'horizontal', //列表的横纵排列样式
+                    color: '#fff',
+                    inactiveColor: '#fff', //图例关闭时的颜色
+                    x: 'center',
+                    y: "5%",
+                    data: ['稿源单位', '非稿源单位'],
+                    itemGap: 40,       //图例之间的距离
+                    itemWidth: 10,     //每个图例标识宽度
+                    itemHeight: 10,    //图例标识的高度
+                    textStyle: {       //图例标识旁边的文字的样式
+                        color: '#fff',
+                        fontSize: '12'
+                    }
+                },
+                series: [
+                    {
+                        name:['被转载占比分析'],
+                        type:'pie',
+                        radius: ['50%', '60%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                show: false,
+                                position: 'center'
+                            },
+                            emphasis: {
+                                show: true,
+                                textStyle: {
+                                    fontSize: '20',
+                                    fontWeight: 'bold',
+                                    color:"#fff"
+                                }
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data:[
+                            {
+                                value:obj[0].source,
+                                name:'稿源单位',
+                                itemStyle:{
+                                    color:"#927496"
+                                }
+                            },
+                            {
+                                value:obj[0].unsource,
+                                name:'非稿源单位',
+                                itemStyle:{
+                                    color:"#609bc5"
+                                }
+                            },
+                        ]
+                    }
+                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    })
+</script>
+</body>
+</html>

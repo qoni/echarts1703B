@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+<body>
+<div id="main" style="width: 775px;height:490px;">
+
+</div>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/echarts.min.js"></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"json/pcfgl.json?t="+Math.random()*10000,
+            dataType:"json",
+            success:function (data) {
+                console.log(data.data[1]);
+                chartData(data.data[1]);
+            }
+        });
+        function chartData(obj){
+            var xDate=[],originalylist=[],republishedlist=[],totallist=[];
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+            for(var i=0;i<obj.originalylist.length;i++){
+                xDate.push(obj.originalylist[i].time);
+                originalylist.push(obj.originalylist[i].count);
+                republishedlist.push(obj.republishedlist[i].count);
+                totallist.push(obj.totallist[i].count);
+            }
+            console.log(xDate);
+            // 指定图表的配置项和数据
+            var option = {
+                backgroundColor:"#402b0d",
+                title: {
+                    text: '发稿量分析',
+                    textStyle:{
+                        color:"#fff"
+                    }
+                },
+                tooltip : {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'line',
+                        label: {
+                            backgroundColor: '#6a7985'
+                        }
+                    }
+                },
+                legend: {
+                    top:"20",
+                    data: [
+                        {
+                            name: '发稿量',
+                            textStyle: {
+                                fontSize: 12,
+                                fontWeight: 'bolder',
+                                color: '#fff'
+                            },
+                            icon: 'image://img/icon-05-01.png'
+                        },
+                        {
+                            name: '原创量',
+                            textStyle: {
+                                fontSize: 12,
+                                fontWeight: 'bolder',
+                                color: '#fff'
+                            },
+                            icon: 'image://img/icon-05-02.png'
+                        },
+                        {
+                            name: '转载量',
+                            textStyle: {
+                                fontSize: 12,
+                                fontWeight: 'bolder',
+                                color: '#fff'
+                            },
+                            icon: 'image://img/icon-05-03.png'
+                        }
+                    ]
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        axisTick: {
+                            show: true,
+                            alignWithLabel: true,
+                            inside: true,
+                            length: 3,
+                            lineStyle: {
+                                color: 'rgba(187,166,149,0.3)',
+                                width: 3,
+                            }
+                        },
+                        axisLabel: {//标签设置
+                            color:"#fff",
+                            interval: 2,//间隔显示
+                        },
+                        boundaryGap : false,
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: 'rgba(187,166,149,0.3)',
+                            }
+                        },
+                        data : xDate,
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value',
+                        axisLabel:{
+                            color:"#fff"
+                        },
+                        splitLine: {//Y轴横线
+                            show: false,
+                            lineStyle: {
+                                color: 'rgba(170,152,136,0.3)',
+                                type: 'solid',
+                                width: 1
+                            }
+                        },
+                        axisLine: {//Y轴竖线
+                            show: false,
+                            lineStyle: {
+                                color: '#fff'
+                            }
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                    }
+                ],
+                series : [
+                    {
+                        name:'发稿量',
+                        smooth:true,
+                        symbolSize: 10,
+                        symbol:"image://img/icon-circle02.png",
+                        showSymbol: false,
+                        type:'line',
+                        itemStyle: {
+                            normal: {
+                                color: '#685233'
+                            }
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: '#685233' // 0% 处的颜色
+                                }, {
+                                    offset: 1, color: 'transparent' // 100% 处的颜色
+                                }],
+                                globalCoord: false // 缺省为 false
+                            }
+                        },
+                        data:totallist
+                    },
+                    {
+                        name:'原创量',
+                        smooth:true,
+                        symbolSize: 10,
+                        symbol:"image://img/icon-circle03.png",
+                        showSymbol: false,
+                        type:'line',
+                        itemStyle: {
+                            normal: {
+                                color: '#927496'
+                            }
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: '#927496' // 0% 处的颜色
+                                }, {
+                                    offset: 1, color: 'transparent' // 100% 处的颜色
+                                }],
+                                globalCoord: false // 缺省为 false
+                            }
+                        },
+                        data:originalylist
+                    },
+                    {
+                        name:'转载量',
+                        smooth:true,
+                        symbolSize: 10,
+                        symbol:"image://img/icon-circle04.png",
+                        showSymbol: false,
+                        type:'line',
+                        itemStyle: {
+                            normal: {
+                                color: '#609bc5'
+                            }
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: '#60a3d2' // 0% 处的颜色
+                                }, {
+                                    offset: 1, color: 'transparent' // 100% 处的颜色
+                                }],
+                                globalCoord: false // 缺省为 false
+                            }
+                        },
+                        data:republishedlist
+                    }
+                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+    </style>
+</head>
+<body>
+<div id="main" style="float:left;width: 600px;height:490px;">
+
+</div>
+<div id="top" style="float:left;width:300px;height: 490px">
+
+</div>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/echarts.min.js"></script>
+<script src="js/china.js"></script>
+<script>
+    $(function () {
+        $.ajax({
+            type:"get",
+            url:"json/citys.json?t="+Math.random()*10000,
+            dataType:"json",
+            success:function (data) {
+                console.log(data.data);
+                chartData(data.data);
+                chartDataTop(data.data);
+            }
+        });
+        function chartData(obj){
+            var cityData=[];
+            var geoCoordMap={};
+            $.each(obj,function(index,item){
+                cityData.push({name:item.name,value:item.count});
+                var newData=[];
+                if(item.longitude&&item.latitude){
+                    newData.push(item.longitude,item.latitude);
+                    geoCoordMap[item.name] = newData;
+                }
+                console.log(newData)
+            });
+            console.log(geoCoordMap);
+
+            var convertData = function (data) {
+                var res = [];
+                for (var i = 0; i < data.length; i++) {
+                    var geoCoord = geoCoordMap[data[i].name];
+                    if (geoCoord) {
+                        res.push({
+                            name: data[i].name,
+                            value: geoCoord.concat(data[i].value)
+                        });
+                    }
+                }
+                return res;
+            };
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+            // 指定图表的配置项和数据
+            var option = {
+                backgroundColor:"#402b0d",
+                tooltip : {
+                    trigger: 'item',
+                    formatter: function (p) {
+                        return p.name + ' : ' + p.value[2];
+                    }
+                },
+                geo: {
+                    map: 'china',
+                    label: {
+                        emphasis: {
+                            show: false
+                        }
+                    },
+                    roam: true,
+                    itemStyle: {
+                        normal: {
+                            areaColor: '#4c3d2a',//地图本身的颜色
+                            borderColor: '#111'
+                        },
+                        emphasis: {
+                            areaColor: '#cad'//鼠标移动上去显示的颜色
+                        }
+                    },
+                    zoom:1.2
+                },
+                series : [
+                    {
+                        name: '城市 ',
+                        type: 'scatter',
+                        coordinateSystem: 'geo',
+                        data: convertData(cityData),
+                        symbolSize: 8,
+                        itemStyle: {
+                            normal: {
+                                color: '#ffff00',
+                                opacity: 1
+                            }
+                        }
+                    },
+                    {
+                        name: '城市',
+                        type: 'effectScatter',
+                        coordinateSystem: 'geo',
+                        data: convertData(cityData.sort(function (a, b) {
+                            return b.value - a.value;
+                        }).slice(0, 10)),
+                        symbolSize: 15,
+                        itemStyle: {
+                            normal: {
+                                color: '#ffff00',
+                                opacity: 1
+                            }
+                        },
+                        showEffectOn: 'render',
+                        rippleEffect: {
+                            brushType: 'stroke'
+                        },
+                        hoverAnimation: true,
+                        zlevel: 1
+                    }
+                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+        function chartDataTop(obj) {
+            var ct=[],ctd=[];
+            for (var i = 0; i < (obj.length > 10 ? 10 : data.length); i++) {
+                ct.push(obj[i].name);
+                ctd.push(obj[i].count);
+            }
+            console.log(ct);
+            ct = ct.reverse();
+            ctd = ctd.reverse();
+            var myChart1 = echarts.init(document.getElementById('top'));
+            var option1={
+                backgroundColor:"#402b0d",
+                title: {
+                    text: 'Top 10:',
+                    top:24,
+                    textStyle: {
+                        color: "#ffffff",
+                        fontSize: 13,
+                        fontWeight: "normal"
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '1.5%',
+                    right: '8%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    show: false,
+                    type: 'value',
+                    boundaryGap: [0, 0.01],
+                    position: "top",
+                    scale: true,
+                    axisLabel: {
+                        color: "#ffca2a",
+                        width:10
+                    },
+                    splitNumber: 4,
+                    splitLine: {
+                        show: false
+                    },
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ct,
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        color:"#fff",
+                        fontSize: 13
+                    }
+                },
+                series: [
+                    {
+                        name: '城市',
+                        type: 'bar',
+                        data: ctd,
+                        barWidth: 10,   //柱子的宽度
+                        itemStyle: {
+                            color: "#ae8961",
+                            fontSize: 13,
+                            barBorderRadius: 5
+                        }
+                    },
+
+                ]
+            };
+            myChart1.setOption(option1);
+        }
+    })
+</script>
+</body>
+</html>

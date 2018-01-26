@@ -1,0 +1,9 @@
+{
+  "result": "1",
+  "msg": "请求成功",
+  "data": {
+    "other": 10200,
+    "secondcity": 28874,
+    "firstcity": 45136
+  }
+}
